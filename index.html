@@ -1,5 +1,7 @@
 <div id="app">
 
+    <div class="nav-bar"></div>
+
     <div class="product">
 
         <div class="product-image">
@@ -7,22 +9,22 @@
         </div>
 
         <div class="product-info">
-            <h1>{{ product }}</h1>
+            <h1>{{ title }}</h1>
 
             <p v-if="inventory > 10">In Stock</p>
             <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out!</p>
             <p v-else class="outOfStock">Out of Stock</p>
-            <span v-show="onSale">On Sale!</span>
+            <span>{{ sale }}</span>
 
             <ul>
                 <li v-for="detail in details">{{ detail }}</li>
             </ul>
 
-            <div v-for="variant in variants"
+            <div v-for="(variant, index) in variants"
                  :key="variant.variantID"
                  class="color-box"
                  v-bind:style="{ 'background-color': variant.variantColor }"
-                 v-on:mouseover="updateProduct(variant.variantImage)">
+                 v-on:mouseover="updateProduct(index)">
             </div>
 
             <div>
