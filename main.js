@@ -17,6 +17,10 @@ Vue.component('product', {
         premium: {
             type: Boolean,
             required: true
+        },
+        props_details: {
+            type: Array,
+            required: true
         }
     },
     template: `
@@ -35,7 +39,7 @@ Vue.component('product', {
                 <span>{{ sale }}</span>
                 <p>Shipping: {{ shipping }}</p>
 
-                <product-details v-bind:details="details"></product-details>
+                <product-details v-bind:details="props_details"></product-details>
 
                 <div v-for="(variant, index) in variants"
                      :key="variant.variantID"
@@ -67,7 +71,6 @@ Vue.component('product', {
             description: 'A pair of warm, fuzzy socks',
             selectedVariant: 0,
             onSale: false,
-            details: ['80% cotton', '20% polyester', "Gender-neutral"],
             variants: [
                 {
                     variantId: 2234,
@@ -129,6 +132,7 @@ Vue.component('product', {
 var app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        details: ['80% cotton', '20% polyester', "Gender-neutral"]
     }
 })
