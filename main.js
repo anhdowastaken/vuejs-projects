@@ -48,10 +48,6 @@ Vue.component('product', {
                     <span v-for="size in sizes">{{ size }} </span>
                 </div>
 
-                <div class="cart">
-                    <p>Cart ({{ cart }})</p>
-                </div>
-
                 <button v-on:click="addToCart"
                         v-bind:disabled="inventory == 0"
                         v-bind:class="{ disabledButton: inventory == 0}">Add to Cart</button>
@@ -76,24 +72,21 @@ Vue.component('product', {
                     variantQuantity: 100,
                 },
                 {
-                    variantId: 2234,
+                    variantId: 2235,
                     variantColor: "blue",
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
                     variantQuantity: 10,
                 }
             ],
-            sizes: [38, 39, 40, 41, 42],
-            cart: 0
+            sizes: [38, 39, 40, 41, 42]
         }
     },
     methods: {
         addToCart: function() {
-            this.cart += 1
+            this.$emit('add-to-cart', 'add', this.variants[this.selectedVariant].variantId)
         },
         removeFromCart: function() {
-            if (this.cart > 0) {
-                this.cart -= 1
-            }
+            this.$emit('remove-from-cart', 'remove', this.variants[this.selectedVariant].variantId)
         },
         updateProduct: function(index) {
             this.selectedVariant = index
@@ -129,6 +122,21 @@ Vue.component('product', {
 var app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: []
+    },
+    methods: {
+        updateCart: function(method, id) {
+            if (method === 'add') {
+                this.cart.push(id)
+            } else {
+                for (i = 0; i < this.cart.length; i++) {
+                    if (this.cart[i] == id) {
+                        this.cart.splice(i, 1)
+                        break
+                    }
+                }
+            }
+        }
     }
 })
