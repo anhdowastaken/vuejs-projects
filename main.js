@@ -7,9 +7,99 @@ Vue.component('product-details', {
     },
     template: `
         <ul>
-            <li v-for="detail in details">{{ detail }}</li>
+            <li v-for="(detail, index) in details" :key="index">{{ detail }}</li>
         </ul>
     `
+})
+
+Vue.component('product-review', {
+    template: `
+        <div>
+            <form class="review-form" v-on:submit.prevent="onSubmit">
+
+                <div v-if="errors.length">
+                    <p>Please correct error(s) below before submit!</p>
+                    <ul>
+                        <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <label for="name">Name</label>
+                    <input id="name" name="name" v-model="name" placeholder="Name"/>
+                </div>
+
+                <div>
+                    <label for="review">Review</label>
+                    <textarea id="review" name="review" v-model="review" placeholder="Review"/>
+                </div>
+
+                <div>
+                    <label for="raring">Rating</label>
+                    <select id="rating" name="rating" v-model.number="rating">
+                        <option value="5">5</option>
+                        <option value="4">4</option>
+                        <option value="3">3</option>
+                        <option value="2">2</option>
+                        <option value="1">1</option>
+                    </select>
+                </div>
+
+                <div>
+                    <input id="recommend" name="recommend" type="checkbox" v-model="recommend" style="width: auto;"/>
+                    <span>Recommend</span>
+                </div>
+
+                <div>
+                    <input type="submit" value="Submit" />
+                </div>
+
+            </form>
+        </div>
+    `,
+    data: function() {
+        return {
+            name: null,
+            review: null,
+            // rating: 5,
+            rating: null,
+            recommend: false,
+            errors: []
+        }
+    },
+    methods: {
+        onSubmit: function() {
+            if (this.name && this.review && this.rating) {
+                let review = {
+                    name: this.name,
+                    review: this.review,
+                    rating: this.rating,
+                    recommend: this.recommend
+                }
+                this.$emit('review-submitted', review)
+                this.clearData()
+            } else {
+                this.errors = []
+                if (!this.name) {
+                    this.errors.push('Name is required')
+                }
+                if (!this.review) {
+                    this.errors.push('Review is required')
+                }
+                if (!this.rating) {
+                    this.errors.push('Rating is required')
+                }
+            }
+        },
+        clearData: function() {
+            this.name = null
+            this.review = null
+            // this.rating = 5
+            this.rating = null
+            this.recommend = false
+            this.errors = []
+        }
+    }
 })
 
 Vue.component('product', {
@@ -45,14 +135,28 @@ Vue.component('product', {
                 </div>
 
                 <div>
-                    <span v-for="size in sizes">{{ size }} </span>
+                    <span v-for="(size, index) in sizes" :key="index">{{ size }} </span>
                 </div>
 
                 <button v-on:click="addToCart"
                         v-bind:disabled="inventory == 0"
                         v-bind:class="{ disabledButton: inventory == 0}">Add to Cart</button>
                 <button v-on:click="removeFromCart">Remove from Cart</button>
+
             </div>
+
+            <div>
+                <h2>Review</h2>
+                <p v-show="!reviews.length">There is no review!</p>
+                <div v-for="(review, index) in reviews" :key="index">
+                    <p>{{ review.name }}</p>
+                    <p v-if="review.recommend">Recommend!</p>
+                    <p>Rating: {{ review.rating }}</p>
+                    <p>{{ review.review }}</p>
+                </div>
+            </div>
+
+            <product-review v-on:review-submitted="addReview"></product-review>
 
         </div>
     `,
@@ -78,7 +182,8 @@ Vue.component('product', {
                     variantQuantity: 10,
                 }
             ],
-            sizes: [38, 39, 40, 41, 42]
+            sizes: [38, 39, 40, 41, 42],
+            reviews: []
         }
     },
     methods: {
@@ -90,6 +195,9 @@ Vue.component('product', {
         },
         updateProduct: function(index) {
             this.selectedVariant = index
+        },
+        addReview: function(review) {
+            this.reviews.push(review)
         }
     },
     computed: {
